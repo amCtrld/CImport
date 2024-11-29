@@ -13,10 +13,10 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="mb-4 text-2xl font-bold">Welcome, {user.name}</h1>
+    <div className="p-6 bg-gray-200">
+      <h1 className="mb-4 text-2xl font-bold text-black">Welcome, {user.name}</h1>
       <p className="mb-4">Role: {user.role}</p>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 text-black">
         <ShipmentTracker />
         <DocumentUpload />
         <InventoryManagement />

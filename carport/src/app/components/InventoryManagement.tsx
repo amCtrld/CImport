@@ -23,9 +23,9 @@ export default function InventoryManagement() {
   }, [])
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 bg-white shadow p-4">
       <h2 className="mb-4 text-xl font-semibold">Inventory Management</h2>
-      <table className="w-full border-collapse">
+      <table className="w-full border-collapse table-auto">
         <thead>
           <tr className="bg-gray-200">
             <th className="p-2 text-left">ID</th>

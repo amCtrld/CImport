@@ -21,8 +21,8 @@ export default function ShipmentTracker() {
   }, [])
 
   return (
-    <div className="mt-6">
-      <h2 className="mb-4 text-xl font-semibold">Shipment Tracker</h2>
+    <div className="mt-6 bg-white rounded-xl text-sm">
+      <h2 className="mb-4 text-xl font-semibold selection:p-4">Shipment Tracker</h2>
       <ul className="space-y-2">
         {shipments.map((shipment) => (
           <li key={shipment.id} className="p-3 bg-white rounded shadow">

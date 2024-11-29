@@ -23,7 +23,7 @@ export default function DocumentUpload() {
   }
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 bg-white p-4 rounded-xl shadow">
       <h2 className="mb-4 text-xl font-semibold">Document Upload</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
@@ -34,7 +34,7 @@ export default function DocumentUpload() {
         <button
           type="submit"
           disabled={!file}
-          className="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600 disabled:bg-gray-400"
+          className="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
         >
           Upload Document
         </button>
