@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { GlobalProvider } from './context/GlobalContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,19 +18,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gray-200">
-        <header className="bg-black shadow">
-  <div className="p-2 flex justify-center items-center">
-    <h1 className="text-3xl font-bold text-white">
-      <span>CAR</span>
-      <span className='text-blue-500'>PORT</span>
-    </h1>
-    <p className="text-2xl text-white p-2">|</p>
-    <p className="text-sm text-white p-2">Your Trusted Car Importer</p>
-  </div>
-</header>
-          <main>{children}</main>
-        </div>
+        <GlobalProvider>
+          <div className="min-h-screen bg-gray-100">
+            <header className="bg-white shadow">
+              <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <h1 className="text-3xl font-bold text-gray-900">CARPORT</h1>
+                <p className="text-sm text-gray-600">Your Trusted Car Importer</p>
+              </div>
+            </header>
+            <main>{children}</main>
+          </div>
+        </GlobalProvider>
       </body>
     </html>
   )

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { dataStore } from '@/app/lib/dataStore'
+import { useGlobalContext } from '@/app/context/GlobalContext'
 
 type ImportData = {
   vin: string
@@ -24,6 +24,7 @@ type ImportData = {
 }
 
 export default function AdminImport() {
+  const { shipments, setShipments, importData, setImportData } = useGlobalContext()
   const [formData, setFormData] = useState<ImportData>({
     vin: '',
     make: '',
@@ -49,7 +50,6 @@ export default function AdminImport() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const shipments = dataStore.getShipments()
     const newShipment = {
       id: Date.now().toString(),
       vin: formData.vin,
@@ -61,19 +61,15 @@ export default function AdminImport() {
       arrivalDate: '',
       clearance: 'Pending'
     }
-    shipments.push(newShipment)
-    dataStore.setShipments(shipments)
-    
-    const importData = dataStore.getImportData()
-    importData.push(formData)
-    dataStore.setImportData(importData)
+    setShipments([...shipments, newShipment])
+    setImportData([...importData, formData])
     
     alert('Import data submitted successfully!')
     router.push('/admin/dashboard')
   }
 
   const handleLogout = () => {
-    sessionStorage.removeItem('userType')
+    localStorage.removeItem('userType')
     router.push('/')
   }
 

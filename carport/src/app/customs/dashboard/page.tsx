@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { dataStore } from '@/app/lib/dataStore'
+import { useGlobalContext } from '@/app/context/GlobalContext'
 
 type Vehicle = {
   id: string
@@ -14,15 +14,13 @@ type Vehicle = {
 }
 
 export default function CustomsDashboard() {
+  const { shipments, setShipments, importData } = useGlobalContext()
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const router = useRouter()
 
   useEffect(() => {
-    dataStore.initializeFromSession()
-    const shipments = dataStore.getShipments()
-    const importData = dataStore.getImportData()
-    const combinedData = shipments.map((shipment: any) => {
-      const importInfo = importData.find((data: any) => data.vin === shipment.vin)
+    const combinedData = shipments.map(shipment => {
+      const importInfo = importData.find(data => data.vin === shipment.vin)
       return {
         id: shipment.id,
         vin: shipment.vin,
@@ -33,22 +31,17 @@ export default function CustomsDashboard() {
       }
     })
     setVehicles(combinedData)
-  }, [])
+  }, [shipments, importData])
 
   const handleClearance = (id: string) => {
-    const updatedVehicles = vehicles.map(vehicle => 
-      vehicle.id === id ? { ...vehicle, status: 'Cleared' } : vehicle
-    )
-    setVehicles(updatedVehicles)
-    
-    const updatedShipments = dataStore.getShipments().map((shipment: any) =>
+    const updatedShipments = shipments.map(shipment =>
       shipment.id === id ? { ...shipment, clearance: 'Cleared' } : shipment
     )
-    dataStore.setShipments(updatedShipments)
+    setShipments(updatedShipments)
   }
 
   const handleLogout = () => {
-    sessionStorage.removeItem('userType')
+    localStorage.removeItem('userType')
     router.push('/')
   }
 

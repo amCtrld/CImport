@@ -1,41 +1,25 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { dataStore } from '@/app/lib/dataStore'
-
-type Shipment = {
-  id: string
-  make: string
-  model: string
-  year: number
-  mileage: number
-  shipmentDate: string
-  arrivalDate: string
-  clearance: string
-}
+import { useGlobalContext } from '@/app/context/GlobalContext'
 
 export default function AdminDashboard() {
+  const { shipments, inventory } = useGlobalContext()
   const [activeShipments, setActiveShipments] = useState(0)
   const [pendingClearances, setPendingClearances] = useState(0)
   const [inStock, setInStock] = useState(0)
-  const [shipments, setShipments] = useState<Shipment[]>([])
   const router = useRouter()
 
   useEffect(() => {
-    dataStore.initializeFromSession()
-    const storedShipments = dataStore.getShipments()
-    setShipments(storedShipments)
-    setActiveShipments(storedShipments.length)
-    setPendingClearances(storedShipments.filter((s: Shipment) => s.clearance === 'Pending').length)
-    
-    const storedInventory = dataStore.getInventory()
-    setInStock(storedInventory.length)
-  }, [])
+    setActiveShipments(shipments.length)
+    setPendingClearances(shipments.filter(s => s.clearance === 'Pending').length)
+    setInStock(inventory.length)
+  }, [shipments, inventory])
 
   const handleLogout = () => {
-    sessionStorage.removeItem('userType')
+    localStorage.removeItem('userType')
     router.push('/')
   }
 

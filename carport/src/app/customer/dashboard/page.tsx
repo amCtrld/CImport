@@ -1,57 +1,43 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { dataStore } from '@/app/lib/dataStore'
-
-type Vehicle = {
-  id: string
-  make: string
-  model: string
-  year: number
-  price: number
-}
+import { useGlobalContext } from '@/app/context/GlobalContext'
 
 export default function CustomerDashboard() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([])
+  const { inventory } = useGlobalContext()
   const [searchTerm, setSearchTerm] = useState('')
   const router = useRouter()
-
-  useEffect(() => {
-    dataStore.initializeFromSession()
-    const inventory = dataStore.getInventory()
-    setVehicles(inventory)
-  }, [])
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value.toLowerCase())
   }
 
-  const filteredVehicles = vehicles.filter(vehicle => 
+  const filteredVehicles = inventory.filter(vehicle => 
     vehicle.make.toLowerCase().includes(searchTerm) || 
     vehicle.model.toLowerCase().includes(searchTerm)
   )
 
   const handleEnquiry = (id: string) => {
-    const vehicle = vehicles.find(v => v.id === id)
+    const vehicle = inventory.find(v => v.id === id)
     if (vehicle) {
-      const enquiries = JSON.parse(sessionStorage.getItem('enquiries') || '[]')
+      const enquiries = JSON.parse(localStorage.getItem('enquiries') || '[]')
       enquiries.push({
         id: Date.now().toString(),
         vehicleId: id,
         make: vehicle.make,
         model: vehicle.model,
         year: vehicle.year,
-        customerEmail: JSON.parse(sessionStorage.getItem('currentUser') || '{}').email
+        customerEmail: JSON.parse(localStorage.getItem('currentUser') || '{}').email
       })
-      sessionStorage.setItem('enquiries', JSON.stringify(enquiries))
+      localStorage.setItem('enquiries', JSON.stringify(enquiries))
       alert('Enquiry submitted successfully!')
     }
   }
 
   const handleLogout = () => {
-    sessionStorage.removeItem('userType')
-    sessionStorage.removeItem('currentUser')
+    localStorage.removeItem('userType')
+    localStorage.removeItem('currentUser')
     router.push('/')
   }
 
@@ -72,7 +58,7 @@ export default function CustomerDashboard() {
           <div key={vehicle.id} className="p-4 bg-white rounded shadow">
             <h2 className="text-xl font-bold">{vehicle.make} {vehicle.model}</h2>
             <p>Year: {vehicle.year}</p>
-            <p>Price: {vehicle.price.toLocaleString()} KES</p>
+            <p>Price: {vehicle.sellingPrice.toLocaleString()} KES</p>
             <button 
               onClick={() => handleEnquiry(vehicle.id)}
               className="mt-2 px-3 py-1 bg-blue-500 text-white rounded"

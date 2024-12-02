@@ -1,23 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { dataStore } from '@/app/lib/dataStore'
-
-interface Vehicle {
-  id: string
-  make: string
-  model: string
-  year: number
-  mileage: number
-  buyingPrice: number
-  sellingPrice: number
-}
+import { useGlobalContext } from '@/app/context/GlobalContext'
 
 export default function AdminInventory() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([])
-  const [newVehicle, setNewVehicle] = useState<Omit<Vehicle, 'id'>>({
+  const { inventory, setInventory } = useGlobalContext()
+  const [newVehicle, setNewVehicle] = useState({
     make: '',
     model: '',
     year: 0,
@@ -28,20 +18,13 @@ export default function AdminInventory() {
   const [showAddForm, setShowAddForm] = useState(false)
   const router = useRouter()
 
-  useEffect(() => {
-    dataStore.initializeFromSession()
-    const storedVehicles = dataStore.getInventory()
-    setVehicles(storedVehicles)
-  }, [])
-
   const handleAddVehicle = (e: React.FormEvent) => {
     e.preventDefault()
-    const updatedVehicles = [
-      ...vehicles,
+    const updatedInventory = [
+      ...inventory,
       { ...newVehicle, id: Date.now().toString() }
     ]
-    setVehicles(updatedVehicles)
-    dataStore.setInventory(updatedVehicles)
+    setInventory(updatedInventory)
     setShowAddForm(false)
     setNewVehicle({
       make: '',
@@ -59,7 +42,7 @@ export default function AdminInventory() {
   }
 
   const handleLogout = () => {
-    sessionStorage.removeItem('userType')
+    localStorage.removeItem('userType')
     router.push('/')
   }
 
@@ -107,7 +90,7 @@ export default function AdminInventory() {
           </tr>
         </thead>
         <tbody>
-          {vehicles.map((vehicle) => (
+          {inventory.map((vehicle) => (
             <tr key={vehicle.id} className="border-b">
               <td className="p-2">{vehicle.make}</td>
               <td className="p-2">{vehicle.model}</td>

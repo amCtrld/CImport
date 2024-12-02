@@ -12,10 +12,10 @@ export default function SignupPage() {
     e.preventDefault()
     const password = Math.random().toString(36).slice(-8)
     
-    // Store user data in sessionStorage
-    const users = JSON.parse(sessionStorage.getItem('users') || '[]')
+    // Store user data in localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]')
     users.push({ name, email, password })
-    sessionStorage.setItem('users', JSON.stringify(users))
+    localStorage.setItem('users', JSON.stringify(users))
     
     alert(`Signup successful! Your password is: ${password}`)
     router.push('/login')
