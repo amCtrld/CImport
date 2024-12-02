@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { dataStore } from '@/app/lib/dataStore'
 
 type ImportData = {
   vin: string
@@ -48,20 +49,25 @@ export default function AdminImport() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const shipments = JSON.parse(sessionStorage.getItem('shipments') || '[]')
+    const shipments = dataStore.getShipments()
     const newShipment = {
       id: Date.now().toString(),
+      vin: formData.vin,
       make: formData.make,
       model: formData.model,
       year: parseInt(formData.year),
-      mileage: 0, // You might want to add this to the form
+      mileage: 0,
       shipmentDate: new Date().toISOString().split('T')[0],
-      arrivalDate: '', // You might want to calculate this or add to the form
+      arrivalDate: '',
       clearance: 'Pending'
     }
     shipments.push(newShipment)
-    sessionStorage.setItem('shipments', JSON.stringify(shipments))
-    sessionStorage.setItem('importData', JSON.stringify([...JSON.parse(sessionStorage.getItem('importData') || '[]'), formData]))
+    dataStore.setShipments(shipments)
+    
+    const importData = dataStore.getImportData()
+    importData.push(formData)
+    dataStore.setImportData(importData)
+    
     alert('Import data submitted successfully!')
     router.push('/admin/dashboard')
   }
@@ -75,14 +81,14 @@ export default function AdminImport() {
     <div className="p-6">
       <nav className="mb-6 flex justify-between items-center">
         <div>
-          <Link href="/admin/dashboard" className="mr-4 bg-blue-950 p-4 rounded-xl">Dashboard</Link>
-          <Link href="/admin/inventory" className="mr-4 bg-blue-950 p-4 rounded-xl">Inventory</Link>
-          <Link href="/admin/import" className="mr-4 bg-blue-950 p-4 rounded-xl">Import</Link>
+          <Link href="/admin/dashboard" className="mr-4">Dashboard</Link>
+          <Link href="/admin/inventory" className="mr-4">Inventory</Link>
+          <Link href="/admin/import" className="mr-4">Import</Link>
         </div>
         <button onClick={handleLogout} className="px-4 py-2 bg-red-500 text-white rounded">Sign Out</button>
       </nav>
-      <h1 className="mb-6 text-2xl font-bold text-black">Import Vehicle</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white text-black p-4 rounded-xl shadow-md">
+      <h1 className="mb-6 text-2xl font-bold">Import Vehicle</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <h2 className="text-xl font-bold">Vehicle Information</h2>
         <input type="text" name="vin" placeholder="VIN" onChange={handleChange} className="w-full p-2 border rounded" required />
         <input type="text" name="make" placeholder="Make" onChange={handleChange} className="w-full p-2 border rounded" required />

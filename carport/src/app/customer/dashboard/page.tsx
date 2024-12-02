@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { dataStore } from '@/app/lib/dataStore'
 
 type Vehicle = {
   id: string
@@ -17,7 +18,8 @@ export default function CustomerDashboard() {
   const router = useRouter()
 
   useEffect(() => {
-    const inventory = JSON.parse(sessionStorage.getItem('inventory') || '[]')
+    dataStore.initializeFromSession()
+    const inventory = dataStore.getInventory()
     setVehicles(inventory)
   }, [])
 

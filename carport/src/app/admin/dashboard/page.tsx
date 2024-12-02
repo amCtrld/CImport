@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { dataStore } from '@/app/lib/dataStore'
 
 type Shipment = {
   id: string
@@ -23,12 +24,13 @@ export default function AdminDashboard() {
   const router = useRouter()
 
   useEffect(() => {
-    const storedShipments = JSON.parse(sessionStorage.getItem('shipments') || '[]')
+    dataStore.initializeFromSession()
+    const storedShipments = dataStore.getShipments()
     setShipments(storedShipments)
     setActiveShipments(storedShipments.length)
     setPendingClearances(storedShipments.filter((s: Shipment) => s.clearance === 'Pending').length)
     
-    const storedInventory = JSON.parse(sessionStorage.getItem('inventory') || '[]')
+    const storedInventory = dataStore.getInventory()
     setInStock(storedInventory.length)
   }, [])
 
@@ -41,31 +43,31 @@ export default function AdminDashboard() {
     <div className="p-6">
       <nav className="mb-6 flex justify-between items-center">
         <div>
-          <Link href="/admin/dashboard" className="mr-4 bg-blue-950 p-4 rounded-xl">Dashboard</Link>
-          <Link href="/admin/inventory" className="mr-4 bg-blue-950 p-4 rounded-xl">Inventory</Link>
-          <Link href="/admin/import" className="mr-4 bg-blue-950 p-4 rounded-xl">Import</Link>
+          <Link href="/admin/dashboard" className="mr-4">Dashboard</Link>
+          <Link href="/admin/inventory" className="mr-4">Inventory</Link>
+          <Link href="/admin/import" className="mr-4">Import</Link>
         </div>
         <button onClick={handleLogout} className="px-4 py-2 bg-red-500 text-white rounded">Sign Out</button>
       </nav>
-      <h1 className="mb-6 text-2xl font-bold text-black">Admin Dashboard</h1>
-      <div className="grid grid-cols-3 gap-4 mb-6 text-black">
-        <div className="p-4 bg-blue-300 rounded shadow-md">
+      <h1 className="mb-6 text-2xl font-bold">Admin Dashboard</h1>
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="p-4 bg-white rounded shadow">
           <h2 className="font-bold">Active Shipments</h2>
           <p className="text-2xl">{activeShipments}</p>
         </div>
-        <div className="p-4 bg-purple-300 rounded shadow-md">
+        <div className="p-4 bg-white rounded shadow">
           <h2 className="font-bold">Pending Clearances</h2>
           <p className="text-2xl">{pendingClearances}</p>
         </div>
-        <div className="p-4 bg-green-300 rounded shadow-md">
+        <div className="p-4 bg-white rounded shadow">
           <h2 className="font-bold">In Stock</h2>
           <p className="text-2xl">{inStock}</p>
         </div>
       </div>
-      <h2 className="mb-4 text-xl font-bold text-black">Shipment Summary</h2>
-      <table className="w-full text-black shadow-lg">
+      <h2 className="mb-4 text-xl font-bold">Shipment Summary</h2>
+      <table className="w-full">
         <thead>
-          <tr className="bg-black text-white">
+          <tr className="bg-gray-200">
             <th className="p-2 text-left">Make</th>
             <th className="p-2 text-left">Model</th>
             <th className="p-2 text-left">Year</th>

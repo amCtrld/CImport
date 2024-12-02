@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { dataStore } from '@/app/lib/dataStore'
 
 type Vehicle = {
   id: string
+  vin: string
   make: string
   model: string
   year: number
-  vin: string
   status: string
 }
 
@@ -17,13 +18,17 @@ export default function CustomsDashboard() {
   const router = useRouter()
 
   useEffect(() => {
-    const shipments = JSON.parse(sessionStorage.getItem('shipments') || '[]')
-    const importData = JSON.parse(sessionStorage.getItem('importData') || '[]')
+    dataStore.initializeFromSession()
+    const shipments = dataStore.getShipments()
+    const importData = dataStore.getImportData()
     const combinedData = shipments.map((shipment: any) => {
       const importInfo = importData.find((data: any) => data.vin === shipment.vin)
       return {
-        ...shipment,
-        vin: importInfo ? importInfo.vin : 'N/A',
+        id: shipment.id,
+        vin: shipment.vin,
+        make: shipment.make,
+        model: shipment.model,
+        year: shipment.year,
         status: shipment.clearance
       }
     })
@@ -36,10 +41,10 @@ export default function CustomsDashboard() {
     )
     setVehicles(updatedVehicles)
     
-    const updatedShipments = JSON.parse(sessionStorage.getItem('shipments') || '[]').map((shipment: any) =>
+    const updatedShipments = dataStore.getShipments().map((shipment: any) =>
       shipment.id === id ? { ...shipment, clearance: 'Cleared' } : shipment
     )
-    sessionStorage.setItem('shipments', JSON.stringify(updatedShipments))
+    dataStore.setShipments(updatedShipments)
   }
 
   const handleLogout = () => {
@@ -48,29 +53,29 @@ export default function CustomsDashboard() {
   }
 
   return (
-    <div className="p-6 text-black">
+    <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Customs Dashboard</h1>
         <button onClick={handleLogout} className="px-4 py-2 bg-red-500 text-white rounded">Log Out</button>
       </div>
-      <table className="w-full bg-white">
+      <table className="w-full">
         <thead>
-          <tr className="bg-black text-white">
+          <tr className="bg-gray-200">
+            <th className="p-2 text-left">VIN</th>
             <th className="p-2 text-left">Make</th>
             <th className="p-2 text-left">Model</th>
             <th className="p-2 text-left">Year</th>
-            <th className="p-2 text-left">VIN</th>
             <th className="p-2 text-left">Status</th>
             <th className="p-2 text-left">Action</th>
           </tr>
         </thead>
         <tbody>
           {vehicles.map((vehicle) => (
-            <tr key={vehicle.id} className="border-b text-black bg-red-700">
+            <tr key={vehicle.id} className="border-b">
+              <td className="p-2">{vehicle.vin}</td>
               <td className="p-2">{vehicle.make}</td>
               <td className="p-2">{vehicle.model}</td>
               <td className="p-2">{vehicle.year}</td>
-              <td className="p-2">{vehicle.vin}</td>
               <td className="p-2">{vehicle.status}</td>
               <td className="p-2">
                 {vehicle.status === 'Pending' && (
