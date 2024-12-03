@@ -1,40 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useGlobalContext } from '@/app/context/GlobalContext'
 
-type Vehicle = {
-  id: string
-  vin: string
-  make: string
-  model: string
-  year: number
-  status: string
-}
-
 export default function CustomsDashboard() {
-  const { shipments, setShipments, importData } = useGlobalContext()
-  const [vehicles, setVehicles] = useState<Vehicle[]>([])
+  const { shipments, setShipments } = useGlobalContext()
   const router = useRouter()
 
-  useEffect(() => {
-    const combinedData = shipments.map(shipment => {
-      const importInfo = importData.find(data => data.vin === shipment.vin)
-      return {
-        id: shipment.id,
-        vin: shipment.vin,
-        make: shipment.make,
-        model: shipment.model,
-        year: shipment.year,
-        status: shipment.clearance
-      }
-    })
-    setVehicles(combinedData)
-  }, [shipments, importData])
-
   const handleClearance = (id: string) => {
-    const updatedShipments = shipments.map(shipment =>
+    const updatedShipments = shipments.map(shipment => 
       shipment.id === id ? { ...shipment, clearance: 'Cleared' } : shipment
     )
     setShipments(updatedShipments)
@@ -58,22 +32,24 @@ export default function CustomsDashboard() {
             <th className="p-2 text-left">Make</th>
             <th className="p-2 text-left">Model</th>
             <th className="p-2 text-left">Year</th>
+            <th className="p-2 text-left">Mileage</th>
             <th className="p-2 text-left">Status</th>
             <th className="p-2 text-left">Action</th>
           </tr>
         </thead>
         <tbody>
-          {vehicles.map((vehicle) => (
-            <tr key={vehicle.id} className="border-b">
-              <td className="p-2">{vehicle.vin}</td>
-              <td className="p-2">{vehicle.make}</td>
-              <td className="p-2">{vehicle.model}</td>
-              <td className="p-2">{vehicle.year}</td>
-              <td className="p-2">{vehicle.status}</td>
+          {shipments.map((shipment) => (
+            <tr key={shipment.id} className="border-b">
+              <td className="p-2">{shipment.vin}</td>
+              <td className="p-2">{shipment.make}</td>
+              <td className="p-2">{shipment.model}</td>
+              <td className="p-2">{shipment.year}</td>
+              <td className="p-2">{shipment.mileage} KM</td>
+              <td className="p-2">{shipment.clearance}</td>
               <td className="p-2">
-                {vehicle.status === 'Pending' && (
+                {shipment.clearance === 'Pending' && (
                   <button 
-                    onClick={() => handleClearance(vehicle.id)}
+                    onClick={() => handleClearance(shipment.id)}
                     className="px-3 py-1 bg-green-500 text-white rounded"
                   >
                     Clear

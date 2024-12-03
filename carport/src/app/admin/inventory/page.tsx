@@ -1,13 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useGlobalContext } from '@/app/context/GlobalContext'
 
+interface Vehicle {
+  id: string
+  make: string
+  model: string
+  year: number
+  mileage: number
+  buyingPrice: number
+  sellingPrice: number
+  image?: string
+}
+
 export default function AdminInventory() {
   const { inventory, setInventory } = useGlobalContext()
-  const [newVehicle, setNewVehicle] = useState({
+  const [newVehicle, setNewVehicle] = useState<Omit<Vehicle, 'id'>>({
     make: '',
     model: '',
     year: 0,
@@ -15,16 +26,36 @@ export default function AdminInventory() {
     buyingPrice: 0,
     sellingPrice: 0
   })
+  const [image, setImage] = useState<File | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const router = useRouter()
 
-  const handleAddVehicle = (e: React.FormEvent) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setNewVehicle({ ...newVehicle, [name]: name === 'year' || name === 'mileage' || name.includes('Price') ? parseInt(value) : value })
+  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0])
+    }
+  }
+
+  const handleAddVehicle = async (e: React.FormEvent) => {
     e.preventDefault()
-    const updatedInventory = [
+    let imageData = ''
+    if (image) {
+      imageData = await new Promise<string>((resolve) => {
+        const reader = new FileReader()
+        reader.onloadend = () => resolve(reader.result as string)
+        reader.readAsDataURL(image)
+      })
+    }
+    const updatedVehicles = [
       ...inventory,
-      { ...newVehicle, id: Date.now().toString() }
+      { ...newVehicle, id: Date.now().toString(), image: imageData }
     ]
-    setInventory(updatedInventory)
+    setInventory(updatedVehicles)
     setShowAddForm(false)
     setNewVehicle({
       make: '',
@@ -34,11 +65,7 @@ export default function AdminInventory() {
       buyingPrice: 0,
       sellingPrice: 0
     })
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setNewVehicle({ ...newVehicle, [name]: name === 'year' || name === 'mileage' || name.includes('Price') ? parseInt(value) : value })
+    setImage(null)
   }
 
   const handleLogout = () => {
@@ -53,6 +80,7 @@ export default function AdminInventory() {
           <Link href="/admin/dashboard" className="mr-4">Dashboard</Link>
           <Link href="/admin/inventory" className="mr-4">Inventory</Link>
           <Link href="/admin/import" className="mr-4">Import</Link>
+          <Link href="/admin/notifications" className="mr-4">Notifications</Link>
         </div>
         <button onClick={handleLogout} className="px-4 py-2 bg-red-500 text-white rounded">Sign Out</button>
       </nav>
@@ -73,6 +101,7 @@ export default function AdminInventory() {
             <input type="number" name="mileage" placeholder="Mileage" value={newVehicle.mileage || ''} onChange={handleInputChange} className="p-2 border rounded" required />
             <input type="number" name="buyingPrice" placeholder="Buying Price" value={newVehicle.buyingPrice || ''} onChange={handleInputChange} className="p-2 border rounded" required />
             <input type="number" name="sellingPrice" placeholder="Selling Price" value={newVehicle.sellingPrice || ''} onChange={handleInputChange} className="p-2 border rounded" required />
+            <input type="file" name="vehicleImage" onChange={handleImageChange} accept="image/*" className="p-2 border rounded" />
           </div>
           <button type="submit" className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Add Vehicle</button>
         </form>
@@ -86,6 +115,7 @@ export default function AdminInventory() {
             <th className="p-2 text-left">Mileage</th>
             <th className="p-2 text-left">Buying Price</th>
             <th className="p-2 text-left">Selling Price</th>
+            <th className="p-2 text-left">Image</th>
             <th className="p-2 text-left">Action</th>
           </tr>
         </thead>
@@ -98,6 +128,11 @@ export default function AdminInventory() {
               <td className="p-2">{vehicle.mileage} KM</td>
               <td className="p-2">{vehicle.buyingPrice.toLocaleString()} KES</td>
               <td className="p-2">{vehicle.sellingPrice.toLocaleString()} KES</td>
+              <td className="p-2">
+                {vehicle.image && (
+                  <img src={vehicle.image} alt={`${vehicle.make} ${vehicle.model}`} className="w-16 h-16 object-cover" />
+                )}
+              </td>
               <td className="p-2">
                 <button className="px-3 py-1 bg-red-500 text-white rounded">Remove</button>
               </td>

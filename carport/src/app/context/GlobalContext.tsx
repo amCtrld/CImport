@@ -12,6 +12,10 @@ type Shipment = {
   shipmentDate: string
   arrivalDate: string
   clearance: string
+  delivered: boolean
+  image?: string
+  buyingPrice: number
+  sellingPrice: number
 }
 
 type Vehicle = {
@@ -22,6 +26,7 @@ type Vehicle = {
   mileage: number
   buyingPrice: number
   sellingPrice: number
+  image?: string
 }
 
 type ImportData = {
@@ -30,6 +35,7 @@ type ImportData = {
   model: string
   year: string
   type: string
+  mileage: number
   countryOfOrigin: string
   portOfEntry: string
   shipperName: string
@@ -40,6 +46,19 @@ type ImportData = {
   importerAddress: string
   customsValue: string
   dutiesAndTaxes: string
+  shipmentDate: string
+  arrivalDate: string
+  image?: string
+  buyingPrice: number
+  sellingPrice: number
+}
+
+type Notification = {
+  id: string
+  type: 'enquiry' | 'clearance'
+  message: string
+  date: string
+  read: boolean
 }
 
 type GlobalContextType = {
@@ -49,6 +68,8 @@ type GlobalContextType = {
   setInventory: React.Dispatch<React.SetStateAction<Vehicle[]>>
   importData: ImportData[]
   setImportData: React.Dispatch<React.SetStateAction<ImportData[]>>
+  notifications: Notification[]
+  setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined)
@@ -57,16 +78,19 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [shipments, setShipments] = useState<Shipment[]>([])
   const [inventory, setInventory] = useState<Vehicle[]>([])
   const [importData, setImportData] = useState<ImportData[]>([])
+  const [notifications, setNotifications] = useState<Notification[]>([])
 
   useEffect(() => {
     // Load data from localStorage on initial render
     const storedShipments = JSON.parse(localStorage.getItem('shipments') || '[]')
     const storedInventory = JSON.parse(localStorage.getItem('inventory') || '[]')
     const storedImportData = JSON.parse(localStorage.getItem('importData') || '[]')
+    const storedNotifications = JSON.parse(localStorage.getItem('notifications') || '[]')
 
     setShipments(storedShipments)
     setInventory(storedInventory)
     setImportData(storedImportData)
+    setNotifications(storedNotifications)
   }, [])
 
   useEffect(() => {
@@ -74,10 +98,11 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     localStorage.setItem('shipments', JSON.stringify(shipments))
     localStorage.setItem('inventory', JSON.stringify(inventory))
     localStorage.setItem('importData', JSON.stringify(importData))
-  }, [shipments, inventory, importData])
+    localStorage.setItem('notifications', JSON.stringify(notifications))
+  }, [shipments, inventory, importData, notifications])
 
   return (
-    <GlobalContext.Provider value={{ shipments, setShipments, inventory, setInventory, importData, setImportData }}>
+    <GlobalContext.Provider value={{ shipments, setShipments, inventory, setInventory, importData, setImportData, notifications, setNotifications }}>
       {children}
     </GlobalContext.Provider>
   )
