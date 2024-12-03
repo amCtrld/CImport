@@ -112,33 +112,33 @@ export default function AdminDashboard() {
     <div className="p-6">
       <nav className="mb-6 flex justify-between items-center">
         <div>
-          <Link href="/admin/dashboard" className="mr-4">Dashboard</Link>
+          <Link href="/admin/dashboard" className="mr-4 bg-blue-600 p-2 text-white rounded-lg">Dashboard</Link>
           <Link href="/admin/inventory" className="mr-4">Inventory</Link>
           <Link href="/admin/import" className="mr-4">Import</Link>
           <Link href="/admin/notifications" className="mr-4">Notifications</Link>
         </div>
         <button onClick={handleLogout} className="px-4 py-2 bg-red-500 text-white rounded">Sign Out</button>
       </nav>
-      <h1 className="mb-6 text-2xl font-bold">Admin Dashboard</h1>
+      <h1 className="mb-6 text-2xl font-bold bg-black text-white p-2">Admin Dashboard</h1>
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="p-4 bg-white rounded shadow">
+        <div className="p-4 bg-blue-300 rounded shadow-lg">
           <h2 className="font-bold">Active Shipments</h2>
           <p className="text-2xl">{activeShipments}</p>
         </div>
-        <div className="p-4 bg-white rounded shadow">
+        <div className="p-4 bg-red-300 rounded shadow-lg">
           <h2 className="font-bold">Pending Clearances</h2>
           <p className="text-2xl">{pendingClearances}</p>
         </div>
-        <div className="p-4 bg-white rounded shadow">
+        <div className="p-4 bg-green-300 rounded shadow-lg">
           <h2 className="font-bold">In Stock</h2>
           <p className="text-2xl">{inStock}</p>
         </div>
       </div>
-      <div className="mb-6">
-        <h2 className="text-xl font-bold mb-4">Import Trend</h2>
+      <div className="mb-6 bg-white p-4">
+        <h3 className="text-xl font-bold mb-4 bg-gray-600 p-2 text-white shadow-lg">Import Trend</h3>
         <CustomLineChart data={chartData} />
       </div>
-      <h2 className="mb-4 text-xl font-bold">Shipment Summary</h2>
+      <h2 className="mb-4 text-xl font-bold bg-gray-400 p-4">Shipment Summary</h2>
       <table className="w-full">
         <thead>
           <tr className="bg-gray-200">
