@@ -78,7 +78,7 @@ export default function AdminInventory() {
       <nav className="mb-6 flex justify-between items-center">
         <div>
           <Link href="/admin/dashboard" className="mr-4">Dashboard</Link>
-          <Link href="/admin/inventory" className="mr-4">Inventory</Link>
+          <Link href="/admin/inventory" className="mr-4 bg-blue-600 p-2 text-white rounded-lg">Inventory</Link>
           <Link href="/admin/import" className="mr-4">Import</Link>
           <Link href="/admin/notifications" className="mr-4">Notifications</Link>
         </div>
