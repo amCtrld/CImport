@@ -2,16 +2,68 @@
 
 import { useRouter } from 'next/navigation'
 import { useGlobalContext } from '@/app/context/GlobalContext'
+import { useState } from 'react'
+
+type Document = {
+  name: string;
+  verified: boolean;
+}
+
+type ShipmentWithDocs = {
+  id: string;
+  vin: string;
+  make: string;
+  model: string;
+  year: number;
+  mileage: number;
+  clearance: string;
+  documents: Document[];
+}
 
 export default function CustomsDashboard() {
   const { shipments, setShipments } = useGlobalContext()
   const router = useRouter()
+  const [shipmentsWithDocs, setShipmentsWithDocs] = useState<ShipmentWithDocs[]>(
+    shipments.map(shipment => ({
+      ...shipment,
+      documents: [
+        { name: 'Commercial Invoice', verified: false },
+        { name: 'Bill of Lading', verified: false },
+        { name: 'Inspection Certificate', verified: false },
+      ]
+    }))
+  )
+
+  const handleDocumentVerification = (shipmentId: string, docName: string) => {
+    setShipmentsWithDocs(prevShipments => 
+      prevShipments.map(shipment => 
+        shipment.id === shipmentId
+          ? {
+              ...shipment,
+              documents: shipment.documents.map(doc => 
+                doc.name === docName ? { ...doc, verified: !doc.verified } : doc
+              )
+            }
+          : shipment
+      )
+    )
+  }
 
   const handleClearance = (id: string) => {
-    const updatedShipments = shipments.map(shipment => 
-      shipment.id === id ? { ...shipment, clearance: 'Cleared' } : shipment
-    )
-    setShipments(updatedShipments)
+    const shipment = shipmentsWithDocs.find(s => s.id === id)
+    if (shipment && shipment.documents.every(doc => doc.verified)) {
+      const updatedShipments = shipments.map(s => 
+        s.id === id ? { ...s, clearance: 'Cleared' } : s
+      )
+      setShipments(updatedShipments)
+      setShipmentsWithDocs(prevShipments => 
+        prevShipments.map(s => 
+          s.id === id ? { ...s, clearance: 'Cleared' } : s
+        )
+      )
+    } else {
+      alert('All documents must be verified before clearing the shipment.')
+    }
   }
 
   const handleLogout = () => {
@@ -34,11 +86,12 @@ export default function CustomsDashboard() {
             <th className="p-2 text-left">Year</th>
             <th className="p-2 text-left">Mileage</th>
             <th className="p-2 text-left">Status</th>
+            <th className="p-2 text-left">Documents</th>
             <th className="p-2 text-left">Action</th>
           </tr>
         </thead>
         <tbody>
-          {shipments.map((shipment) => (
+          {shipmentsWithDocs.map((shipment) => (
             <tr key={shipment.id} className="border-b">
               <td className="p-2">{shipment.vin}</td>
               <td className="p-2">{shipment.make}</td>
@@ -46,6 +99,19 @@ export default function CustomsDashboard() {
               <td className="p-2">{shipment.year}</td>
               <td className="p-2">{shipment.mileage} KM</td>
               <td className="p-2">{shipment.clearance}</td>
+              <td className="p-2">
+                {shipment.documents.map((doc, index) => (
+                  <div key={index} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={doc.verified}
+                      onChange={() => handleDocumentVerification(shipment.id, doc.name)}
+                      className="mr-2"
+                    />
+                    <span>{doc.name}</span>
+                  </div>
+                ))}
+              </td>
               <td className="p-2">
                 {shipment.clearance === 'Pending' && (
                   <button 

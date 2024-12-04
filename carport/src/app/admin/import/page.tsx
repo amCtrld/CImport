@@ -27,6 +27,9 @@ type ImportData = {
   image?: string
   buyingPrice: number
   sellingPrice: number
+  commercialInvoice?: File
+  billOfLading?: File
+  inspectionCertificate?: File
 }
 
 export default function AdminImport() {
@@ -67,6 +70,13 @@ export default function AdminImport() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImage(e.target.files[0])
+    }
+  }
+
+  const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, files } = e.target
+    if (files && files[0]) {
+      setFormData(prev => ({ ...prev, [name]: files[0] }))
     }
   }
 
@@ -147,9 +157,9 @@ export default function AdminImport() {
         <input type="text" name="importerAddress" placeholder="Address" onChange={handleChange} className="w-full p-2 border rounded" required />
 
         <h2 className="text-xl font-bold">Documents Upload</h2>
-        <input type="file" name="commercialInvoice" className="w-full p-2 border rounded" required />
-        <input type="file" name="billOfLading" className="w-full p-2 border rounded" required />
-        <input type="file" name="inspectionCertificate" className="w-full p-2 border rounded" required />
+        <input type="file" name="commercialInvoice" onChange={handleDocumentChange} className="w-full p-2 border rounded" required />
+        <input type="file" name="billOfLading" onChange={handleDocumentChange} className="w-full p-2 border rounded" required />
+        <input type="file" name="inspectionCertificate" onChange={handleDocumentChange} className="w-full p-2 border rounded" required />
 
         <h2 className="text-xl font-bold">Vehicle Image</h2>
         <input type="file" name="vehicleImage" onChange={handleImageChange} accept="image/*" className="w-full p-2 border rounded" />
